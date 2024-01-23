@@ -126,13 +126,13 @@ model.compile(optimizer=Adam(learning_rate=0.0001),
 # Train Model
 batch_size = 10
 steps = int(len(train_paths) / batch_size)
-epochs = 15
+epochs = 50
 history = model.fit(datagen(train_paths, train_labels, batch_size=batch_size, epochs=epochs),
                     epochs=epochs, steps_per_epoch=steps)
 
 # In[8]:
 # Training History Plot
-plt.figure(figsize=(8, 4))
+plt.figure(figsize=(20, 8))
 plt.grid(True)
 plt.plot(history.history['sparse_categorical_accuracy'], '.g-', linewidth=2)
 plt.plot(history.history['loss'], '.r-', linewidth=2)

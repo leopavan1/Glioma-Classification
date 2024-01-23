@@ -38,7 +38,7 @@ import random
 
 
 # # <b>2 <span style='color:#4285f4'>|</span> Reading the Dataset</b>
-# In[3]:
+# In[2]:
 
 
 train_dir = './train/'
@@ -55,7 +55,7 @@ for label in os.listdir(train_dir):
 train_paths, train_labels = shuffle(train_paths, train_labels)
 
 
-# In[4]:
+# In[3]:
 
 # Directory containing training data
 dir_train = './train'
@@ -95,7 +95,7 @@ for label in os.listdir(test_dir):
 test_paths, test_labels = shuffle(test_paths, test_labels)
 
 
-# In[6]:
+# In[4]:
 
 
 plt.figure(figsize=(14,6))
@@ -112,7 +112,7 @@ plt.pie([len(train_labels), len(test_labels)],
 # - Random Contrast: 80% - 120%
 # 
 
-# In[7]:
+# In[5]:
 
 
 def augment_image(image):
@@ -125,7 +125,7 @@ def augment_image(image):
 
 # <h3 style="font-family:Sans;">Let's plot some Samples :</h3>
 
-# In[8]:
+# In[6]:
 
 
 IMAGE_SIZE = 128
@@ -159,7 +159,7 @@ plt.show()
 #     this function augments the images, normalizes them, encodes the label, and then returns the batch on which the model can train on. <br>
 # </p>
 
-# In[9]:
+# In[7]:
 
 
 unique_labels = os.listdir(train_dir)
@@ -190,7 +190,7 @@ def datagen(paths, labels, batch_size=12, epochs=1):
 
 # ### I am using **VGG16** for transfer learning
 
-# In[10]:
+# In[8]:
 
 
 base_model = VGG16(input_shape=(IMAGE_SIZE,IMAGE_SIZE,3), include_top=False, weights='imagenet')
@@ -214,19 +214,19 @@ model.add(Dropout(0.2))
 model.add(Dense(len(unique_labels), activation='softmax'))
 
 
-# In[11]:
+# In[9]:
 
 
 model.summary()
 
 
-# In[12]:
+# In[10]:
 
 
 keras.utils.plot_model(model, show_shapes=True)
 
 
-# In[13]:
+# In[11]:
 
 
 model.compile(optimizer=Adam(learning_rate=0.0001),
@@ -236,7 +236,7 @@ model.compile(optimizer=Adam(learning_rate=0.0001),
 
 # # <b>6 <span style='color:#4285f4'>|</span> Train Model</b>
 
-# In[14]:
+# In[12]:
 
 batch_size = 10
 steps = int(len(train_paths)/batch_size)
@@ -245,7 +245,7 @@ history = model.fit(datagen(train_paths, train_labels, batch_size=batch_size, ep
                     epochs=epochs, steps_per_epoch=steps)
 
 
-# In[15]:
+# In[13]:
 
 
 plt.figure(figsize=(8,4))
@@ -261,7 +261,7 @@ plt.show()
 
 # # <b>7 <span style='color:#4285f4'>|</span> Evaluate Model with Test Samples</b>
 
-# In[ ]:
+# In[14]:
 
 
 batch_size = 32
@@ -277,7 +277,7 @@ for x,y in tqdm(datagen(test_paths, test_labels, batch_size=batch_size, epochs=1
         y_true.append(i)
 
 
-# In[ ]:
+# In[15]:
 
 print(classification_report(y_true, y_pred))
 # %%
