@@ -31,6 +31,14 @@ from tensorflow.keras.preprocessing.image import load_img
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# For ROC
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
+from sklearn.multiclass import OneVsRestClassifier
+
+# For Confusion_Matrix
+from sklearn.metrics import confusion_matrix
+
 # Miscellaneous
 from tqdm import tqdm
 import os
@@ -280,4 +288,57 @@ for x,y in tqdm(datagen(test_paths, test_labels, batch_size=batch_size, epochs=1
 # In[15]:
 
 print(classification_report(y_true, y_pred))
+# In[16]:
+
+# Converte as labels para one-hot encoding
+y_true_one_hot = label_binarize(y_true, classes=unique_labels)
+y_pred_one_hot = label_binarize(y_pred, classes=unique_labels)
+
+# Calcula a curva ROC para cada classe
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+
+for i in range(len(unique_labels)):
+    fpr[i], tpr[i], _ = roc_curve(y_true_one_hot[:, i], y_pred_one_hot[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
+
+# Calcula a média da curva ROC para todas as classes
+fpr["micro"], tpr["micro"], _ = roc_curve(y_true_one_hot.ravel(), y_pred_one_hot.ravel())
+roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+# Plota a curva ROC para cada classe
+plt.figure(figsize=(12, 8))
+for i in range(len(unique_labels)):
+    plt.plot(fpr[i], tpr[i], label=f'ROC curve (area = {roc_auc[i]:.2f}) for {unique_labels[i]}')
+
+# Plota a curva ROC média
+plt.plot(fpr["micro"], tpr["micro"], label=f'Micro-average ROC curve (area = {roc_auc["micro"]:.2f})', linestyle='--', linewidth=4)
+
+plt.plot([0, 1], [0, 1], 'k--', linewidth=2)
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc="lower right")
+plt.show()
+
+# In[17]:
+
+# Calcula a matriz de confusão
+conf_matrix = confusion_matrix(y_true, y_pred)
+
+# Calcula a matriz de confusão em termos percentuais
+conf_matrix_percent = conf_matrix / conf_matrix.sum(axis=1)[:, np.newaxis]
+
+# Plota a matriz de confusão em termos percentuais usando seaborn
+plt.figure(figsize=(10, 8))
+sns.heatmap(conf_matrix_percent, annot=True, fmt='.2%', cmap='Blues', xticklabels=unique_labels, yticklabels=unique_labels)
+plt.title('Matriz de Confusão em %')
+plt.xlabel('Predito')
+plt.ylabel('Verdadeiro')
+plt.show()
+
+
 # %%
